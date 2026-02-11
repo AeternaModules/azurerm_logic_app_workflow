@@ -37,14 +37,14 @@ EOT
     location                           = string
     name                               = string
     resource_group_name                = string
-    enabled                            = optional(bool, true)
+    enabled                            = optional(bool) # Default: true
     integration_service_environment_id = optional(string)
     logic_app_integration_account_id   = optional(string)
     parameters                         = optional(map(string))
     tags                               = optional(map(string))
     workflow_parameters                = optional(map(string))
-    workflow_schema                    = optional(string, "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#")
-    workflow_version                   = optional(string, "1.0.0.0")
+    workflow_schema                    = optional(string) # Default: "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+    workflow_version                   = optional(string) # Default: "1.0.0.0"
     access_control = optional(object({
       action = optional(object({
         allowed_caller_ip_address_range = set(string)
