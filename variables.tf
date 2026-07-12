@@ -54,13 +54,13 @@ EOT
       }))
       trigger = optional(object({
         allowed_caller_ip_address_range = optional(set(string))
-        open_authentication_policy = optional(object({
-          claim = object({
+        open_authentication_policy = optional(list(object({
+          claim = list(object({
             name  = string
             value = string
-          })
+          }))
           name = string
-        }))
+        })))
       }))
       workflow_management = optional(object({
         allowed_caller_ip_address_range = set(string)
@@ -71,30 +71,6 @@ EOT
       type         = string
     }))
   }))
-  validation {
-    condition = alltrue([
-      for k, v in var.logic_app_workflows : (
-        v.access_control == null || (v.access_control.trigger == null || (v.access_control.trigger.open_authentication_policy == null || (length(v.access_control.trigger.open_authentication_policy.name) > 0)))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.logic_app_workflows : (
-        v.access_control == null || (v.access_control.trigger == null || (v.access_control.trigger.open_authentication_policy == null || (length(v.access_control.trigger.open_authentication_policy.claim.name) > 0)))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.logic_app_workflows : (
-        v.access_control == null || (v.access_control.trigger == null || (v.access_control.trigger.open_authentication_policy == null || (length(v.access_control.trigger.open_authentication_policy.claim.value) > 0)))
-      )
-    ])
-    error_message = "must not be empty"
-  }
   # --- Unconfirmed validation candidates, derived from azurerm_logic_app_workflow's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
@@ -127,6 +103,15 @@ EOT
   #   source:    validation.Any(...) - no translation rule yet, add one
   # path: access_control.trigger.allowed_caller_ip_address_range[*]
   #   source:    validation.Any(...) - no translation rule yet, add one
+  # path: access_control.trigger.open_authentication_policy.name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: access_control.trigger.open_authentication_policy.claim.name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: access_control.trigger.open_authentication_policy.claim.value
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: access_control.workflow_management.allowed_caller_ip_address_range[*]
   #   source:    validation.Any(...) - no translation rule yet, add one
   # path: identity.type
