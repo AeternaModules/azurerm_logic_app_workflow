@@ -1,3 +1,7 @@
+output "logic_app_workflows_id" {
+  description = "Map of id values across all logic_app_workflows, keyed the same as var.logic_app_workflows"
+  value       = { for k, v in azurerm_logic_app_workflow.logic_app_workflows : k => v.id }
+}
 output "logic_app_workflows_access_control" {
   description = "Map of access_control values across all logic_app_workflows, keyed the same as var.logic_app_workflows"
   value       = { for k, v in azurerm_logic_app_workflow.logic_app_workflows : k => v.access_control }
