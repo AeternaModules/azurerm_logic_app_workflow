@@ -37,14 +37,14 @@ EOT
     location                           = string
     name                               = string
     resource_group_name                = string
-    enabled                            = optional(bool) # Default: true
+    enabled                            = optional(bool)
     integration_service_environment_id = optional(string)
     logic_app_integration_account_id   = optional(string)
     parameters                         = optional(map(string))
     tags                               = optional(map(string))
     workflow_parameters                = optional(map(string))
-    workflow_schema                    = optional(string) # Default: "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
-    workflow_version                   = optional(string) # Default: "1.0.0.0"
+    workflow_schema                    = optional(string)
+    workflow_version                   = optional(string)
     access_control = optional(object({
       action = optional(object({
         allowed_caller_ip_address_range = set(string)
@@ -71,6 +71,14 @@ EOT
       type         = string
     }))
   }))
+  validation {
+    condition = alltrue([
+      for k, v in var.logic_app_workflows : (
+        v.access_control == null || (v.access_control.trigger == null || (v.access_control.trigger.open_authentication_policy == null || alltrue([for item in v.access_control.trigger.open_authentication_policy : (length(item.claim) >= 1)])))
+      )
+    ])
+    error_message = "Each claim list must contain at least 1 items"
+  }
   # --- Unconfirmed validation candidates, derived from azurerm_logic_app_workflow's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
